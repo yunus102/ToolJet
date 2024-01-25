@@ -12,6 +12,7 @@ import './datepicker.scss';
 import CustomDatePickerHeader from './CustomDatePickerHeader';
 import { valueinTimeStamp } from './datepickerUtils';
 import { setHours, setMinutes, set, format } from 'date-fns';
+import { TimePickerComponent } from './Timepicker';
 
 const TjDatepicker = forwardRef(
   ({ value, onClick, styles, setShowValidationError, setIsFocused, fireEvent, dateInputRef }, ref) => {
@@ -544,6 +545,7 @@ export const Datepicker = function Datepicker({
           maxTime={setHours(setMinutes(new Date(), maxTime.minutes), maxTime.hours)}
           renderCustomHeader={(headerProps) => <CustomDatePickerHeader {...headerProps} />}
         />
+        <TimePickerComponent />
         {loading && <Loader style={{ ...loaderStyle }} width="16" />}
         <div
           data-cy="date-picker-invalid-feedback"
