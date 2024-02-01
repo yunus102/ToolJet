@@ -431,6 +431,7 @@ export function CodeHinter({
               {paramLabel !== 'Type' &&
                 paramLabel !== ' ' &&
                 paramLabel !== 'Padding' &&
+                paramLabel !== 'Width' &&
                 !hideFx && ( //add some key if these extends
                   <FxButton
                     active={codeShow}
@@ -496,6 +497,7 @@ export function CodeHinter({
                   maxHeight: '320px',
                   overflow: 'auto',
                   fontSize: ' .875rem',
+                  maxWidth: paramLabel == 'Tooltip' && '190px',
                 }}
                 data-cy={`${cyLabel}-input-field`}
               >
