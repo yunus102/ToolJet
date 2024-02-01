@@ -21,14 +21,13 @@ const TjDatepicker = forwardRef(
         onBlur={(e) => {
           setShowValidationError(true);
           setIsFocused(false);
-          e.stopPropagation();
           fireEvent('onBlur');
-          setIsFocused(false);
+          e.stopPropagation();
         }}
         onFocus={(e) => {
           setIsFocused(true);
-          e.stopPropagation();
           fireEvent('onFocus');
+          e.stopPropagation();
         }}
         className="custom-input-datepicker"
         value={value}
@@ -55,8 +54,18 @@ export const Datepicker = function Datepicker({
   dataCy,
   isResizing,
 }) {
-  const { enableTime, enableDate, defaultValue, tooltip, label, loadingState, disabledState, timeFormat, timeZone } =
-    properties;
+  const {
+    enableTime,
+    enableDate,
+    defaultValue,
+    tooltip,
+    label,
+    loadingState,
+    disabledState,
+    timeFormat,
+    timeZone,
+    enableTwentyFourHour,
+  } = properties;
   const format = typeof properties.format === 'string' ? properties.format : '';
   const {
     padding,
@@ -97,7 +106,7 @@ export const Datepicker = function Datepicker({
   const [excludedDates, setExcludedDates] = useState([]);
   const [showValidationError, setShowValidationError] = useState(false);
 
-  const selectedDateFormat = enableTime ? `${format} LT` : format;
+  const selectedDateFormat = enableTime ? (enableTwentyFourHour ? `${format} HH:mm a` : `${format} hh:mm a`) : format;
 
   const computeDateString = (date) => {
     if (enableDate) {
@@ -126,7 +135,7 @@ export const Datepicker = function Datepicker({
       setExposedVariable('value', undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultValue]);
+  }, [defaultValue, enableTime]);
 
   const disabledDates = component?.definition?.validation?.disabledDates?.value;
 
@@ -147,8 +156,9 @@ export const Datepicker = function Datepicker({
   const validationData = validate(exposedVariables.value);
   const { isValid, validationError } = validationData;
   const convertTime = (timeInput) => {
+    console.log('time---', timeInput);
     if (timeInput) {
-      const [hours, minutes] = timeInput.split(':').map(Number);
+      const [hours, minutes] = timeInput && timeInput.split(':').map(Number);
       return { hours, minutes };
     }
     return {};
@@ -163,8 +173,8 @@ export const Datepicker = function Datepicker({
   const [disable, setDisable] = useState(disabledState || loadingState);
   const [minDate, setMinDate] = useState(component?.definition?.validation?.minDate?.value);
   const [maxDate, setMaxDate] = useState(component?.definition?.validation?.maxDate?.value);
-  const [minTime, setMinTime] = useState(convertTime(component?.definition?.validation?.minTime?.value));
-  const [maxTime, setMaxTime] = useState(convertTime(component?.definition?.validation?.maxTime?.value));
+  const [minTime, setMinTime] = useState(component?.definition?.validation?.minTime?.value);
+  const [maxTime, setMaxTime] = useState(component?.definition?.validation?.maxTime?.value);
 
   console.log('try---', minTime, maxTime);
 
@@ -189,8 +199,8 @@ export const Datepicker = function Datepicker({
   }, [date]);
 
   useEffect(() => {
-    setExposedVariable('dateFormat', selectedDateFormat);
-  }, [selectedDateFormat]);
+    setExposedVariable('dateFormat', format);
+  }, [format]);
 
   useEffect(() => {
     setExposedVariable('timeFormat', timeFormat);
@@ -334,8 +344,8 @@ export const Datepicker = function Datepicker({
         year: year,
         month: month, // Months are zero-based, so May is 4
         date: day,
-        hours: date?.getHours(),
-        minutes: date?.getMinutes(),
+        // hours: date?.getHours(),
+        // minutes: date?.getMinutes(),
       });
       console.log('Date----', newDate);
       setDate(newDate);
@@ -415,15 +425,7 @@ export const Datepicker = function Datepicker({
       // moment(1369266934311).utcOffset(-420).format('YYYY-MM-DD HH:mm');
     });
   }, []);
-
-  // useEffect(() => {
-  //   setExposedVariable('setMinDate', async function (date) {
-  //     setMinDate(date);
-  //   });
-  //   setExposedVariable('setMaxDate', async function (date) {
-  //     setMaxDate(date);
-  //   });
-  // }, []);
+  console.log('max--', maxTime, minTime);
 
   // useEffect(() => {
   //   setExposedVariable('setMinTime', async function (time) {
@@ -489,11 +491,11 @@ export const Datepicker = function Datepicker({
               marginRight: label?.length > 0 && direction === 'left' && defaultAlignment === 'side' ? '9px' : '',
               marginLeft: label?.length > 0 && direction === 'right' && defaultAlignment === 'side' ? '9px' : '',
               display: 'flex',
-              // overflow: label?.length > 18 && 'hidden', // Hide any content that overflows the box
-              // textOverflow: 'ellipsis', // Display ellipsis for overflowed content
+              overflow: label?.length > 18 && 'hidden', // Hide any content that overflows the box
+              textOverflow: 'ellipsis', // Display ellipsis for overflowed content
               fontWeight: 500,
               textAlign: direction == 'right' ? 'right' : 'left',
-              // whiteSpace: 'nowrap', // Keep the text in a single line
+              whiteSpace: 'nowrap', // Keep the text in a single line
             }}
           >
             <span
@@ -514,12 +516,10 @@ export const Datepicker = function Datepicker({
           className={`input-field form-control tj-text-input-widget  ${
             !isValid && showValidationError ? 'is-invalid' : ''
           } validation-without-icon px-2 ${darkMode ? 'bg-dark color-white' : 'bg-light'}`}
-          popperClassName="tj-datepicker-widget"
+          popperClassName={`tj-datepicker-widget ${!enableDate && 'tj-datepicker-widget-hidden'}`}
           selected={date}
           onChange={(date) => onDateChange(date)}
           value={date !== null ? computeDateString(date) : 'select date'}
-          showTimeInput={enableTime ? true : false}
-          showTimeSelectOnly={enableDate ? false : true}
           onFocus={(event) => {
             onComponentClick(id, component, event);
           }}
@@ -532,28 +532,24 @@ export const Datepicker = function Datepicker({
               dateInputRef={dateInputRef}
             />
           }
+          timeFormat={enableTwentyFourHour ? 'HH:mm' : timeFormat}
+          showTimeSelect={enableTime}
+          showTimeSelectOnly={enableDate ? false : true}
           showMonthDropdown
           showYearDropdown
           dropdownMode="select"
           excludeDates={excludedDates}
-          timeInputLabel={<div className={`${darkMode && 'theme-dark'}`}>Time</div>}
           showPopperArrow={false}
-          timeFormat={timeFormat === 'HH:mm' ? 'HH:mm' : 'hh:mm a'}
-          minDate={minDate && new Date(minDate)}
-          maxDate={maxDate && new Date(maxDate)}
-          minTime={setHours(setMinutes(new Date(), minTime.minutes), minTime.hours)}
-          maxTime={setHours(setMinutes(new Date(), maxTime.minutes), maxTime.hours)}
           renderCustomHeader={(headerProps) => <CustomDatePickerHeader {...headerProps} />}
         />
-        <TimePickerComponent />
         {loading && <Loader style={{ ...loaderStyle }} width="16" />}
-        <div
-          data-cy="date-picker-invalid-feedback"
-          className={`invalid-feedback ${isValid ? '' : 'd-flex'}`}
-          style={{ color: errTextColor, textAlign: direction == 'left' && 'end' }}
-        >
-          {showValidationError && validationError}
-        </div>
+      </div>
+      <div
+        data-cy="date-picker-invalid-feedback"
+        className={`invalid-feedback ${isValid ? '' : 'd-flex'}`}
+        style={{ color: errTextColor, textAlign: direction == 'left' && 'end' }}
+      >
+        {showValidationError && validationError}
       </div>
     </>
   );

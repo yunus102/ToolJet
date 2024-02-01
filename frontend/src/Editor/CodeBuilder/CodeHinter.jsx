@@ -22,7 +22,7 @@ import { Json } from './Elements/Json';
 import { Select } from './Elements/Select';
 import { Toggle } from './Elements/Toggle';
 import { ToggleDropdown } from './Elements/ToggleDropdown';
-
+import { TimePicker } from './Elements/TimePicker';
 import { AlignButtons } from './Elements/AlignButtons';
 import { TypeMapping } from './TypeMapping';
 import { Number } from './Elements/Number';
@@ -63,6 +63,7 @@ const AllElements = {
   Icon,
   Visibility,
   ToggleDropdown,
+  TimePicker,
 };
 
 export function CodeHinter({
@@ -97,6 +98,7 @@ export function CodeHinter({
   isIcon = false,
   paramUpdated,
   staticText,
+  hideFx = false,
 }) {
   const darkMode = localStorage.getItem('darkMode') === 'true';
   const options = {
@@ -398,14 +400,14 @@ export function CodeHinter({
   const [forceCodeBox, setForceCodeBox] = useState(fxActive);
   const codeShow = (type ?? 'code') === 'code' || forceCodeBox;
   cyLabel = paramLabel ? paramLabel.toLowerCase().trim().replace(/\s+/g, '-') : cyLabel;
-  console.log('paramLabel--', paramLabel, paramLabel?.length);
+  console.log('paramLabel--', paramLabel, hideFx);
   return (
     <div ref={wrapperRef} className={cx({ 'codeShow-active': codeShow, 'd-flex': paramLabel == 'Tooltip' })}>
       <div
-        className={cx('d-flex justify-content-between')}
+        className={cx('d-flex justify-content-between', { 'flex-column': hideFx })}
         style={{
           marginRight: paramLabel == 'Tooltip' && '40px',
-          alignItems: paramLabel == 'Tooltip' ? 'flex-start' : 'center',
+          alignItems: paramLabel == 'Tooltip' ? 'flex-start' : !hideFx && 'center',
         }}
       >
         {paramLabel && !HIDDEN_CODE_HINTER_LABELS.includes(paramLabel) && (
@@ -423,12 +425,13 @@ export function CodeHinter({
         <div className={`${(type ?? 'code') === 'code' ? 'd-none' : ''} `}>
           <div
             style={{ width: width, marginBottom: codeShow ? '0.5rem' : '0px' }}
-            className="d-flex align-items-center"
+            className="d-flex align-items-center justify-content-end"
           >
             <div className="col-auto pt-0 fx-common">
               {paramLabel !== 'Type' &&
                 paramLabel !== ' ' &&
-                paramLabel !== 'Padding' && ( //add some key if these extends
+                paramLabel !== 'Padding' &&
+                !hideFx && ( //add some key if these extends
                   <FxButton
                     active={codeShow}
                     onPress={() => {

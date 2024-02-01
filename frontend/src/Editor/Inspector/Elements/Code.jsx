@@ -87,6 +87,7 @@ export const Code = ({
     return param.name;
   }, [param]);
 
+  console.log('paramMeta---', paramMeta);
   return (
     <div className={`field ${paramMeta?.styleClass} ${options.className}`} style={{ marginBottom: '8px' }}>
       <CodeHinter
@@ -109,6 +110,7 @@ export const Code = ({
         verticalLine={verticalLine}
         isIcon={paramMeta?.isIcon}
         staticText={paramMeta?.staticText}
+        hideFx={paramMeta?.hideFx}
         placeholder={placeholder}
         bold={true}
       />

@@ -1,13 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // eslint-disable-next-line import/no-unresolved
-import TimePicker from 'react-time-picker';
+import DatePickerComponent from 'react-datepicker';
 
-export const TimePickerComponent = function TimePickerComponent() {
-  const [value, onChange] = useState('10:00');
-
+export const TimePickerComponent = function TimePickerComponent({
+  enableTime,
+  timeFormat,
+  onChange,
+  selected,
+  maxTime,
+  minTime,
+  value,
+}) {
   return (
     <div>
-      <TimePicker onChange={onChange} value={value} clearIcon clockIcon={null} disableClock />
+      <DatePickerComponent
+        selected={selected}
+        onChange={onChange}
+        showTimeSelect
+        showTimeSelectOnly
+        timeIntervals={15}
+        timeCaption="Time"
+        dateFormat={timeFormat}
+        maxTime={maxTime}
+        timeFormat={timeFormat}
+        minTime={minTime}
+        timeInputLabel=""
+        className="timepicker-validation"
+      />
     </div>
   );
 };

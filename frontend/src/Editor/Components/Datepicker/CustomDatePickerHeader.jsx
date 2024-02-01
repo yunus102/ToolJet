@@ -27,7 +27,11 @@ const CustomDatePickerHeader = ({
     'December',
   ];
 
-  const years = range(1990, getYear(new Date()) + 1, 1);
+  const currentYear = new Date().getFullYear();
+  const yearsBackward = 100;
+  const yearsForward = 100;
+
+  const years = range(currentYear - yearsBackward, currentYear + yearsForward + 1);
 
   return (
     <>
