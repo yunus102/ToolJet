@@ -54,6 +54,8 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import { OverlayTriggerComponent } from './OverlayTriggerComponent';
 // eslint-disable-next-line import/no-unresolved
 import { diff } from 'deep-object-diff';
+import { VirtuosoGrid } from 'react-virtuoso';
+
 
 // utilityForNestedNewRow function is used to construct nested object while adding or updating new row when '.' is present in column key for adding new row
 const utilityForNestedNewRow = (row) => {
@@ -389,14 +391,14 @@ export function Table({
 
   const useDynamicColumn = resolveReferences(component.definition.properties?.useDynamicColumn?.value, currentState);
   if (currentState) {
-    tableData = resolveReferences(component.definition.properties.data.value, currentState, []);
+    tableData = useMemo(()=>resolveReferences(component.definition.properties.data.value, currentState, []),[JSON.stringify(properties.data)]) ;
     dynamicColumn = useDynamicColumn
       ? resolveReferences(component.definition.properties?.columnData?.value, currentState, []) ?? []
       : [];
     if (!Array.isArray(tableData)) {
       tableData = [];
     } else {
-      tableData = tableData.filter((data) => data !== null && data !== undefined);
+      tableData =  tableData.filter((data) => data !== null && data !== undefined);
     }
   }
 
@@ -404,7 +406,7 @@ export function Table({
 
   const tableRef = useRef();
 
-  let columnData = generateColumnsData({
+  let columnData = useMemo(()=>generateColumnsData({
     columnProperties: useDynamicColumn ? generatedColumn : component.definition.properties.columns.value,
     columnSizes,
     currentState,
@@ -421,7 +423,7 @@ export function Table({
     t,
     darkMode,
     tableColumnEvents: tableColumnEvents,
-  });
+  }),[JSON.stringify(component.definition.properties.columns.value),JSON.stringify(tableData)]) ;
 
   columnData = useMemo(
     () =>
@@ -433,7 +435,7 @@ export function Table({
     [columnData, currentState]
   );
 
-  const columnDataForAddNewRows = generateColumnsData({
+  const columnDataForAddNewRows = useMemo(()=>generateColumnsData({
     columnProperties: useDynamicColumn ? generatedColumn : component.definition.properties.columns.value,
     columnSizes,
     currentState,
@@ -449,7 +451,7 @@ export function Table({
     tableRef,
     t,
     darkMode,
-  });
+  }),[JSON.stringify(component.definition.properties.columns.value),JSON.stringify(tableDetails.addNewRowsDetails)]) ;
 
   const [leftActionsCellData, rightActionsCellData] = useMemo(
     () =>
@@ -537,7 +539,7 @@ export function Table({
   const computedStyles = {
     // width: `${width}px`,
   };
-
+  console.log('manish');
   const {
     getTableProps,
     getTableBodyProps,
@@ -830,9 +832,9 @@ export function Table({
 
   const hoverRef = useRef();
 
-  useEffect(() => {
-    if (rowDetails?.hoveredRowId !== '' && hoverRef.current !== rowDetails?.hoveredRowId) rowHover();
-  }, [rowDetails]);
+  // useEffect(() => {
+  //   if (rowDetails?.hoveredRowId !== '' && hoverRef.current !== rowDetails?.hoveredRowId) rowHover();
+  // }, [rowDetails]);
 
   useEffect(() => {
     setExposedVariable(
@@ -841,11 +843,11 @@ export function Table({
     );
   }, [JSON.stringify(globalFilteredRows.map((row) => row.original))]);
 
-  const rowHover = () => {
-    mergeToTableDetails(rowDetails);
-    setExposedVariables(rowDetails);
-    fireEvent('onRowHovered');
-  };
+  // const rowHover = () => {
+  //   mergeToTableDetails(rowDetails);
+  //   setExposedVariables(rowDetails);
+  //   fireEvent('onRowHovered');
+  // };
   useEffect(() => {
     if (_.isEmpty(changeSet)) {
       setExposedVariable(
@@ -979,6 +981,8 @@ export function Table({
     }
     return totalWidth;
   };
+
+  console.log('manish :: row page',{rows,page});
   return (
     <div
       data-cy={`draggable-widget-${String(component.name).toLowerCase()}`}
@@ -1298,8 +1302,189 @@ export function Table({
           </thead>
 
           {!loadingState && (
-            <tbody {...getTableBodyProps()} style={{ color: computeFontColor() }}>
-              {page.map((row, index) => {
+            <tbody {...getTableBodyProps()} style={{ color: computeFontColor() , height:'100%' }}>
+              {/* <FixedSizeList
+                height={500}
+                itemCount={page.length}
+                itemSize={35}
+                width={width}
+              >
+                {({ index }) => {
+                  
+                }}
+              </FixedSizeList> */}
+              <VirtuosoGrid
+                style={{ height: '95%' }}
+                totalCount={page?.length}
+                itemContent={useCallback((index) => {
+                    const row = page[index];
+                    prepareRow(row);
+                    return (
+                      <tr
+                        key={index}
+                        className={`table-row table-editor-component-row ${
+                          allowSelection &&
+                          highlightSelectedRow &&
+                          ((row.isSelected && row.id === tableDetails.selectedRowId) ||
+                            (showBulkSelector &&
+                              row.isSelected &&
+                              tableDetails?.selectedRowsDetails?.some((singleRow) => singleRow.selectedRowId === row.id)))
+                            ? 'selected'
+                            : ''
+                        }`}
+                        {...row.getRowProps()}
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          // toggleRowSelected will triggered useRededcuer function in useTable and in result will get the selectedFlatRows consisting row which are selected
+                          if (allowSelection) {
+                            await toggleRowSelected(row.id);
+                          }
+                          const selectedRow = row.original;
+                          const selectedRowId = row.id;
+                          setExposedVariables({ selectedRow, selectedRowId });
+                          mergeToTableDetails({ selectedRow, selectedRowId });
+                          fireEvent('onRowClicked');
+                        }}
+                        // onMouseOver={(e) => {
+                        //   if (hoverAdded) {
+                        //     const hoveredRowDetails = { hoveredRowId: row.id, hoveredRow: row.original };
+                        //     setRowDetails(hoveredRowDetails);
+                        //     hoverRef.current = rowDetails?.hoveredRowId;
+                        //   }
+                        // }}
+                        // onMouseLeave={(e) => {
+                        //   hoverAdded && setRowDetails({ hoveredRowId: '', hoveredRow: '' });
+                        // }}
+                      >
+                        {row.cells.map((cell, index) => {
+                          let cellProps = cell.getCellProps();
+                          cellProps.style.textAlign = cell.column?.horizontalAlignment;
+                          if (tableDetails.changeSet) {
+                            if (tableDetails.changeSet[cell.row.index]) {
+                              const currentColumn = columnData.find((column) => column.id === cell.column.id);
+                              if (
+                                _.get(tableDetails.changeSet[cell.row.index], currentColumn?.accessor, undefined) !==
+                                undefined
+                              ) {
+                                cellProps.style.backgroundColor = 'var(--orange3)';
+                                cellProps.style['--tblr-table-accent-bg'] = 'var(--orange3)';
+                              }
+                            }
+                          }
+                          if (cell.column.columnType === 'selector') {
+                            cellProps.style.width = 40;
+                            cellProps.style.padding = 0;
+                          }
+                          if (cell.column.Header === 'Actions') {
+                            cellProps.style.width = 'fit-content';
+                            cellProps.style.maxWidth = 'fit-content';
+                          }
+                          if (
+                            row.cells?.[row.cells?.length - 1]?.column.Header === 'Actions' &&
+                            index === row?.cells?.length - 2
+                          ) {
+                            cellProps.style.flex = '1 1 auto';
+                          }
+                          const wrapAction = textWrapActions(cell.column.id);
+                          const rowChangeSet = changeSet ? changeSet[cell.row.index] : null;
+                          const cellValue = rowChangeSet ? rowChangeSet[cell.column.name] || cell.value : cell.value;
+                          const rowData = tableData[cell.row.index];
+                          const cellBackgroundColor = resolveReferences(
+                            cell.column?.cellBackgroundColor,
+                            currentState,
+                            '',
+                            {
+                              cellValue,
+                              rowData,
+                            }
+                          );
+                          const cellTextColor = resolveReferences(cell.column?.textColor, currentState, '', {
+                            cellValue,
+                            rowData,
+                          });
+                          const actionButtonsArray = actions.map((action) => {
+                            return {
+                              ...action,
+                              isDisabled: resolveReferences(action?.disableActionButton ?? false, currentState, '', {
+                                cellValue,
+                                rowData,
+                              }),
+                            };
+                          });
+                          const isEditable = resolveReferences(cell.column?.isEditable ?? false, currentState, '', {
+                            cellValue,
+                            rowData,
+                          });
+                          const horizontalAlignment = cell.column?.horizontalAlignment;
+                          return (
+                            // Does not require key as its already being passed by react-table via cellProps
+                            // eslint-disable-next-line react/jsx-key
+                            <td
+                              data-cy={`${cell.column.columnType ?? ''}${String(
+                                cell.column.id === 'rightActions' || cell.column.id === 'leftActions' ? cell.column.id : ''
+                              )}${String(cellValue ?? '').toLocaleLowerCase()}-cell-${index}`}
+                              className={cx(
+                                `table-text-align-${cell.column.horizontalAlignment} ${
+                                  wrapAction ? wrapAction : cell?.column?.Header === 'Actions' ? '' : 'wrap'
+                                }-wrapper td`,
+                                {
+                                  'has-actions': cell.column.id === 'rightActions' || cell.column.id === 'leftActions',
+                                  'has-left-actions': cell.column.id === 'leftActions',
+                                  'has-right-actions': cell.column.id === 'rightActions',
+                                  'has-text': cell.column.columnType === 'text' || isEditable,
+                                  'has-dropdown': cell.column.columnType === 'dropdown',
+                                  'has-multiselect': cell.column.columnType === 'multiselect',
+                                  'has-datepicker': cell.column.columnType === 'datepicker',
+                                  'align-items-center flex-column': cell.column.columnType === 'selector',
+                                  [cellSize]: true,
+                                  'selector-column':
+                                    cell.column.columnType === 'selector' && cell.column.id === 'selection',
+                                  'resizing-column': cell.column.isResizing || cell.column.id === resizingColumnId,
+                                }
+                              )}
+                              {...cellProps}
+                              style={{ ...cellProps.style, backgroundColor: cellBackgroundColor ?? 'inherit' }}
+                              onClick={(e) => {
+                                setExposedVariable('selectedCell', {
+                                  columnName: cell.column.exportValue,
+                                  columnKey: cell.column.key,
+                                  value: cellValue,
+                                });
+                              }}
+                            >
+                              <div
+                                className={`td-container ${
+                                  cell.column.columnType === 'image' && 'jet-table-image-column'
+                                } ${cell.column.columnType !== 'image' && `w-100 h-100`}`}
+                              >
+                                {/* <GenerateEachCellValue
+                                  cellValue={cellValue}
+                                  globalFilter={state.globalFilter}
+                                  cellRender={cell.render('Cell', {
+                                    cell,
+                                    actionButtonsArray,
+                                    isEditable,
+                                    horizontalAlignment,
+                                  })}
+                                  rowChangeSet={rowChangeSet}
+                                  isEditable={isEditable}
+                                  columnType={cell.column.columnType}
+                                  isColumnTypeAction={['rightActions', 'leftActions'].includes(cell.column.id)}
+                                  cellTextColor={cellTextColor}
+                                  cell={cell}
+                                  currentState={currentState}
+                                /> */}
+                                {cell.render('Cell')}
+                              </div>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  },[_.toString(page),prepareRow])
+                }
+              />
+              {/* {page.map((row, index) => {
                 prepareRow(row);
                 return (
                   <tr
@@ -1462,7 +1647,7 @@ export function Table({
                     })}
                   </tr>
                 );
-              })}
+              })} */}
             </tbody>
           )}
         </table>

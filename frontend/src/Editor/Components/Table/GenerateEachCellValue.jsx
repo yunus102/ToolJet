@@ -93,20 +93,20 @@ export default function GenerateEachCellValue({
           setHighlighterCells(false);
         }
       }}
-      onBlur={(e) => {
-        e.stopPropagation();
-        if (isTabKeyPressed.current) {
-          isTabKeyPressed.current = false;
-          return;
-        } else {
-          updateCellValue.current = e.target.value;
-          //removing _.isEmpty(rowChangeSet) flag from if statement at the end
-          if (!showHighlightedCells && updateCellValue.current === cellValue) {
-            updateCellValue.current = null;
-            setHighlighterCells(true);
-          }
-        }
-      }}
+      // onBlur={(e) => {
+      //   e.stopPropagation();
+      //   if (isTabKeyPressed.current) {
+      //     isTabKeyPressed.current = false;
+      //     return;
+      //   } else {
+      //     updateCellValue.current = e.target.value;
+      //     //removing _.isEmpty(rowChangeSet) flag from if statement at the end
+      //     if (!showHighlightedCells && updateCellValue.current === cellValue) {
+      //       updateCellValue.current = null;
+      //       setHighlighterCells(true);
+      //     }
+      //   }
+      // }}
       onKeyUp={(e) => {
         if (e.key === 'Tab') {
           isTabKeyPressed.current = true;
