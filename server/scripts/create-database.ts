@@ -41,6 +41,9 @@ async function createDatabase(): Promise<void> {
     if (process.env.ENABLE_TOOLJET_DB === 'true') {
       await createTooljetDb(envVars, envVars.TOOLJET_DB);
     }
+    if (process.env.ENABLE_SAMPLE_PG_DB === 'true') {
+      await createSampleDb(envVars, envVars.SAMPLE_DB);
+    }
   }
 }
 
@@ -94,6 +97,28 @@ async function createTooljetDb(envVars, dbName): Promise<void> {
   } catch (error) {
     if (error.message.includes(`database "${dbName}" already exists`)) {
       console.log(`Using Tooljet database\nTOOLJET_DB: ${dbName}\nTOOLJET_DB_HOST: ${envVars.TOOLJET_DB_HOST}\n`);
+    } else {
+      throw error;
+    }
+  }
+}
+
+async function createSampleDb(envVars, dbName): Promise<void> {
+  if (isEmpty(dbName)) {
+    throw new Error('Database name cannot be empty');
+  }
+
+  try {
+    executeCreateDb(
+      envVars.SAMPLE_PG_DB_HOST,
+      envVars.SAMPLE_PG_DB_PORT,
+      envVars.SAMPLE_PG_DB_USER,
+      envVars.SAMPLE_PG_DB_PASS,
+      dbName
+    );
+  } catch (error) {
+    if (error.message.includes(`database "${dbName}" already exists`)) {
+      console.log(`Alreddy running Sample database\n${dbName}\n HOST: ${envVars.SAMPLE_PG_DB_HOST}\n`);
     } else {
       throw error;
     }
