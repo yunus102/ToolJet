@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import { ExecFileSyncOptions, execFileSync } from 'child_process';
 import { buildAndValidateDatabaseConfig } from './database-config-utils';
 import { isEmpty } from 'lodash';
+import { populateSampleData } from './populate-sample-db';
 
 async function createDatabaseFromFile(envPath: string): Promise<void> {
   const result = dotenv.config({ path: envPath });
@@ -43,6 +44,7 @@ async function createDatabase(): Promise<void> {
     }
     if (process.env.ENABLE_SAMPLE_PG_DB === 'true') {
       await createSampleDb(envVars, envVars.SAMPLE_DB);
+      await populateSampleData(envVars);
     }
   }
 }
@@ -118,7 +120,9 @@ async function createSampleDb(envVars, dbName): Promise<void> {
     );
   } catch (error) {
     if (error.message.includes(`database "${dbName}" already exists`)) {
-      console.log(`Alreddy running Sample database\n${dbName}\n HOST: ${envVars.SAMPLE_PG_DB_HOST}\n`);
+      console.log(
+        `Alreddy present Sample database\n${dbName}\n HOST: ${envVars.SAMPLE_PG_DB_HOST}\n PORT: ${envVars.SSAMPLE_PG_DB_PORT}`
+      );
     } else {
       throw error;
     }
