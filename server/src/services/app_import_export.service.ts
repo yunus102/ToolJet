@@ -240,6 +240,7 @@ export class AppImportExportService {
     const shouldUpdateForGridCompatibility = !cloning;
 
     const importedApp = await this.createImportedAppForUser(this.entityManager, schemaUnifiedAppParams, user);
+    const currentTooljetVersion = !cloning ? tooljetVersion : null;
 
     await this.setupImportedAppAssociations(
       this.entityManager,
@@ -249,7 +250,7 @@ export class AppImportExportService {
       externalResourceMappings,
       isNormalizedAppDefinitionSchema,
       shouldUpdateForGridCompatibility,
-      tooljetVersion
+      currentTooljetVersion
     );
     await this.createAdminGroupPermissions(this.entityManager, importedApp);
 
@@ -329,7 +330,7 @@ export class AppImportExportService {
     externalResourceMappings: Record<string, unknown>,
     isNormalizedAppDefinitionSchema: boolean,
     shouldUpdateForGridCompatibility: boolean,
-    tooljetVersion: string
+    tooljetVersion: string | null
   ) {
     // Old version without app version
     // Handle exports prior to 0.12.0
@@ -600,7 +601,7 @@ export class AppImportExportService {
     importingComponents: Component[],
     importingEvents: EventHandler[],
     shouldUpdateForGridCompatibility: boolean,
-    tooljetVersion: string
+    tooljetVersion: string | null
   ): Promise<AppResourceMappings> {
     appResourceMappings = { ...appResourceMappings };
 
@@ -1711,15 +1712,22 @@ function migrateProperties(
   componentType: NewRevampedComponent,
   component: Component,
   componentTypes: NewRevampedComponent[],
-  tooljetVersion: string
+  tooljetVersion: string | null
 ) {
-  const shouldHandleBackwardCompatibility = isVersionGreaterThanOrEqual(tooljetVersion, '2.29.0') ? false : true;
+  console.log('--arpit::', { tooljetVersion });
 
   const properties = { ...component.properties };
   const styles = { ...component.styles };
   const general = { ...component.general };
   const validation = { ...component.validation };
   const generalStyles = { ...component.generalStyles };
+
+  if (!tooljetVersion) {
+    return { properties, styles, general, generalStyles, validation };
+  }
+
+  const shouldHandleBackwardCompatibility = isVersionGreaterThanOrEqual(tooljetVersion, '2.29.0') ? false : true;
+
   // Check if the component type is included in the specified component types
   if (componentTypes.includes(componentType as NewRevampedComponent)) {
     if (styles.visibility) {
