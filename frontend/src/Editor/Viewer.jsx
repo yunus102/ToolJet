@@ -392,6 +392,7 @@ class ViewerComponent extends React.Component {
     const isMobileDevice = this.state.deviceWindowWidth < 600;
     useEditorStore.getState().actions.toggleCurrentLayout(isMobileDevice ? 'mobile' : 'desktop');
     window.addEventListener('message', this.handleMessage);
+    window.addEventListener('resize', this.setCanvasAreaWidth);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -480,6 +481,10 @@ class ViewerComponent extends React.Component {
   getCanvasWidth = () => {
     const canvasBoundingRect = document.getElementsByClassName('canvas-area')[0]?.getBoundingClientRect();
     return canvasBoundingRect?.width;
+  };
+
+  setCanvasAreaWidth = () => {
+    this.setState({ canvasAreaWidth: this.getCanvasWidth() });
   };
 
   computeCanvasBackgroundColor = () => {
@@ -727,7 +732,7 @@ class ViewerComponent extends React.Component {
                                   return onComponentOptionChanged(component, optionName, value);
                                 }}
                                 onComponentOptionsChanged={onComponentOptionsChanged}
-                                canvasWidth={this.getCanvasWidth()}
+                                canvasWidth={this.state.canvasAreaWidth || this.getCanvasWidth()}
                                 dataQueries={dataQueries}
                                 currentPageId={this.state.currentPageId}
                               />
