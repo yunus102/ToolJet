@@ -1,3 +1,4 @@
+import { tracer } from './tracing';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { WsAdapter } from '@nestjs/platform-ws';
@@ -41,6 +42,8 @@ function replaceSubpathPlaceHoldersInStaticAssets() {
 }
 
 async function bootstrap() {
+  tracer.start();
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
     abortOnError: false,
@@ -63,6 +66,7 @@ async function bootstrap() {
   }
   pathsToExclude.push({ path: '/health', method: RequestMethod.GET });
   pathsToExclude.push({ path: '/api/health', method: RequestMethod.GET });
+  pathsToExclude.push({ path: '/metrics', method: RequestMethod.GET });
 
   app.setGlobalPrefix(UrlPrefix + 'api', {
     exclude: pathsToExclude,
