@@ -1,52 +1,42 @@
 import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
-
-// SDK
+import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { NodeSDK } from '@opentelemetry/sdk-node';
-// Instrumentation setup
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
-import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
-import { NestInstrumentation } from '@opentelemetry/instrumentation-nestjs-core';
-import { PgInstrumentation } from '@opentelemetry/instrumentation-pg';
-
-// Collector trace exporter
+import * as process from 'process';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+// import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
-diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
+// diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
-// Tracer provider
-const provider = new NodeTracerProvider({
-  resource: new Resource({ [SemanticResourceAttributes.SERVICE_NAME]: 'tooljet' }),
-});
+const jaegerExporter = new OTLPTraceExporter({ url: 'http://localhost:4318/v1/traces' });
+// const consoleExporter = new ConsoleSpanExporter();
 
-registerInstrumentations({
+// const prometheusExporter = new PrometheusExporter({ port: 9464 });
+
+export const tracer = new NodeSDK({
+  resource: new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: 'tooljet',
+  }),
+  spanProcessors: [new SimpleSpanProcessor(jaegerExporter)],
+// metricReader: prometheusExporter,
   instrumentations: [
-    new HttpInstrumentation(),
-    new ExpressInstrumentation(),
-    new NestInstrumentation(),
-    new PgInstrumentation(),
+    getNodeAutoInstrumentations({
+      '@opentelemetry/instrumentation-http': { enabled: true },
+      '@opentelemetry/instrumentation-express': { enabled: true },
+      '@opentelemetry/instrumentation-nestjs-core': { enabled: true },
+      '@opentelemetry/instrumentation-pg': { enabled: true },
+    }),
   ],
 });
 
-const traceExporter = new OTLPTraceExporter({ url: 'http://localhost:4318/v1/traces' });
-provider.addSpanProcessor(new SimpleSpanProcessor(traceExporter));
-provider.register();
-
-// SDK configuration and start up
-export const tracer = new NodeSDK({ traceExporter });
-
-// For local development to stop the tracing using Control+c
-process.on('SIGINT', async () => {
-  try {
-    await tracer.shutdown();
-    console.log('Tracing finished.');
-  } catch (error) {
-    console.error(error);
-  } finally {
-    process.exit(0);
-  }
+process.on('SIGTERM', () => {
+  tracer
+    .shutdown()
+    .then(
+      () => console.log('Tracing terminated successfully'),
+      (err) => console.log('Error terminating tracing', err)
+    )
+    .finally(() => process.exit(0));
 });
