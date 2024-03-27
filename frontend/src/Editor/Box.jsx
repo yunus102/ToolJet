@@ -68,6 +68,8 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentState } from '@/_stores/currentStateStore';
 import { useAppInfo } from '@/_stores/appDataStore';
 import { isPDFSupported } from '@/_stores/utils';
+// eslint-disable-next-line import/no-unresolved
+import { diff } from 'deep-object-diff';
 
 export const AllComponents = {
   Button,
@@ -159,6 +161,7 @@ export const Box = memo(
     adjustHeightBasedOnAlignment,
     currentLayout,
   }) => {
+    // console.log('here---Box Rendered--- ');
     const { t } = useTranslation();
     const backgroundColor = yellow ? 'yellow' : '';
     const currentState = useCurrentState();
@@ -377,5 +380,12 @@ export const Box = memo(
         </div>
       </OverlayTrigger>
     );
-  }
+  },
+  compareProps
 );
+
+function compareProps(prevProps, nextProps) {
+  const propDiff = diff(prevProps, nextProps);
+  // console.log('here---Box propDiff--- ', Object.keys(propDiff).length, propDiff);
+  return Object.keys(propDiff).length === 0;
+}

@@ -27,7 +27,7 @@ import toast from 'react-hot-toast';
 
 const NO_OF_GRIDS = 43;
 
-export const Container = ({
+const MemoContainer = ({
   canvasWidth,
   mode,
   snapToGrid,
@@ -49,6 +49,7 @@ export const Container = ({
   sideBarDebugger,
   currentPageId,
 }) => {
+  // console.log('here--- Container Rendered--- ');
   // Dont update first time to skip
   // redundant save on app definition load
   const firstUpdate = useRef(true);
@@ -448,7 +449,7 @@ export const Container = ({
         }
       }
     },
-    [boxes, setBoxes]
+    [JSON.stringify(boxes)]
   );
 
   const handleAddThread = async (e) => {
@@ -714,3 +715,11 @@ export const Container = ({
     </div>
   );
 };
+
+function compareProps(prevProps, nextProps) {
+  const propDiff = diff(prevProps, nextProps);
+  // console.log('here--- propDiff--- ', Object.keys(propDiff).length, propDiff);
+  return Object.keys(propDiff).length === 0;
+}
+
+export const Container = React.memo(MemoContainer, compareProps);

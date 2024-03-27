@@ -14,6 +14,8 @@ import { useEditorStore } from '@/_stores/editorStore';
 import { shallow } from 'zustand/shallow';
 import WidgetBox from './WidgetBox';
 import * as Sentry from '@sentry/react';
+// eslint-disable-next-line import/no-unresolved
+import { diff } from 'deep-object-diff';
 const NO_OF_GRIDS = 43;
 
 const resizerClasses = {
@@ -70,6 +72,7 @@ export const DraggableBox = React.memo(
     sideBarDebugger,
     childComponents = null,
   }) => {
+    // console.log('here--- DraggableBox Rendered--- ');
     const [isResizing, setResizing] = useState(false);
     const [isDragging2, setDragging] = useState(false);
     const [canDrag, setCanDrag] = useState(true);
@@ -228,10 +231,13 @@ export const DraggableBox = React.memo(
       }
     }, [layoutData?.height, label?.value?.length, currentLayout]);
 
-    const adjustHeightBasedOnAlignment = (increase) => {
-      if (increase) return setboxHeight(layoutData?.height + 20);
-      else return setboxHeight(layoutData?.height);
-    };
+    const adjustHeightBasedOnAlignment = useCallback(
+      (increase) => {
+        if (increase) return setboxHeight(layoutData?.height + 20);
+        else return setboxHeight(layoutData?.height);
+      },
+      [layoutData?.height]
+    );
     return (
       <div
         className={
@@ -374,5 +380,12 @@ export const DraggableBox = React.memo(
         )}
       </div>
     );
-  }
+  },
+  compareProps
 );
+
+function compareProps(prevProps, nextProps) {
+  const propDiff = diff(prevProps, nextProps);
+  // console.log('here--- propDiff--- ', Object.keys(propDiff).length, propDiff);
+  return Object.keys(propDiff).length === 0;
+}
