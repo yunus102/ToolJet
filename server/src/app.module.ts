@@ -44,14 +44,8 @@ import { OrganizationConstantModule } from './modules/organization_constants/org
 import { RequestContextModule } from './modules/request_context/request-context.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ImportExportResourcesModule } from './modules/import_export_resources/import_export_resources.module';
-import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 const imports = [
-  PrometheusModule.registerAsync({
-    useFactory: () => {
-      return {};
-    },
-  }),
   ScheduleModule.forRoot(),
   ConfigModule.forRoot({
     isGlobal: true,

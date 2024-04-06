@@ -1,26 +1,38 @@
 import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
-import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import * as process from 'process';
 import { Resource } from '@opentelemetry/resources';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-// import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
+import { SEMRESATTRS_SERVICE_NAME, SEMRESATTRS_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 
-// diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
-const jaegerExporter = new OTLPTraceExporter({ url: 'http://localhost:4318/v1/traces' });
-// const consoleExporter = new ConsoleSpanExporter();
+// Traces
+const traceExporter = new OTLPTraceExporter({ url: 'http://localhost:4318/v1/traces' });
+// const traceExporter = new ConsoleSpanExporter();
 
-// const prometheusExporter = new PrometheusExporter({ port: 9464 });
+// Metrics
+const metricExporter = new OTLPMetricExporter({ url: 'http://localhost:4318/v1/metrics' });
+// const metricExporter = new ConsoleMetricExporter();
+
+// Logs
+// TODO:
+// Add logs exporter when stable support for JS is available. Track here:
+// https://github.com/open-telemetry/opentelemetry-js
 
 export const tracer = new NodeSDK({
   resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: 'tooljet',
+    [SEMRESATTRS_SERVICE_NAME]: 'tooljet',
+    [SEMRESATTRS_SERVICE_VERSION]: globalThis.TOOLJET_VERSION,
   }),
-  spanProcessors: [new SimpleSpanProcessor(jaegerExporter)],
-// metricReader: prometheusExporter,
+  spanProcessors: [new BatchSpanProcessor(traceExporter)],
+  metricReader: new PeriodicExportingMetricReader({
+    exporter: metricExporter,
+  }),
   instrumentations: [
     getNodeAutoInstrumentations({
       '@opentelemetry/instrumentation-http': { enabled: true },
