@@ -13,7 +13,7 @@ export class AppAuthenticationDto {
   password: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   redirectTo: string;
 }
 
