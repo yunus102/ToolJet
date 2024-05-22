@@ -207,11 +207,13 @@ function DataSourceSelect({
     // Making the Infinite scroll pagination API to default state
     return () => {
       if (scrollEventForColumnValus) {
+        setIsInitialForeignKeyDataLoaded(false);
         setIsInitialForeignKeSearchDataLoaded(false);
         setTotalRecords(0);
         setPageNumber(1);
         setSearchValue('');
         setSearchResults([]);
+        setReferencedColumnDetails([]);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
