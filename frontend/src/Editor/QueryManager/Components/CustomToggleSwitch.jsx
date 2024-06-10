@@ -9,12 +9,13 @@ export const CustomToggleSwitch = ({
   label = '',
   dataCy = '',
   disabled = false,
+  sublabel = '',
 }) => {
   return (
     <div
       data-tooltip-id={dataCy === 'copilot' ? 'tooltip-for-active-copilot' : ''}
       data-tooltip-content="Only workspace admins can enable or disable Copilot."
-      className={`custom-toggle-switch d-flex col gap-2 align-items-center`}
+      className={`custom-toggle-switch d-flex col gap-2 align-items-top`}
     >
       <label className="switch">
         <input
@@ -34,9 +35,16 @@ export const CustomToggleSwitch = ({
         <label htmlFor={action} className="slider round"></label>
       </label>
       {label && (
-        <span className={`${darkMode ? 'color-white' : 'color-light-slate-12'}`} data-cy={`${dataCy}-toggle-label`}>
-          {label}
-        </span>
+        <div className="d-flex flex-column">
+          <span className={`${darkMode ? 'color-white' : 'color-light-slate-12'}`} data-cy={`${dataCy}-toggle-label`}>
+            {label}
+          </span>
+          {sublabel && (
+            <span className="sublabel-toggle" data-cy={`${dataCy}-toggle-sublabel`}>
+              {sublabel}
+            </span>
+          )}
+        </div>
       )}
       {disabled && dataCy === 'copilot' && (
         <ReactTooltip

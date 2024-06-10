@@ -49,6 +49,14 @@ export const customToggles = {
     label: 'Show notification on success?',
     translatedLabel: 'editor.queryManager.notificationOnSuccess',
   },
+  retryOnNetworkError: {
+    dataCy: 'retry-on-network-errors',
+    action: 'retryOnNetworkError',
+    label: 'Retry on network error',
+    sublabel:
+      'By default, ToolJet tries to hit the API endpoint 3 times before declaring the query failed as the server did not respond',
+    translatedLabel: 'editor.queryManager.retryOnNetworkError',
+  },
 };
 
 export const mockDataQueryAsComponent = (events) => {
