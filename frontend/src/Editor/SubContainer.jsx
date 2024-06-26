@@ -860,14 +860,14 @@ const SubWidgetWrapper = ({
       <Moveable
         target={widgetRef}
         draggable={true}
-        resizable={true}
-        renderDirections={['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se']}
+        // resizable={true}
+        // renderDirections={['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se']}
         throttleDrag={1}
         edgeDraggable={false}
         startDragRotate={0}
         throttleDragRotate={0}
         ables={[MouseCustomAble, DimensionViewable]}
-        // resizable={RESIZABLE_CONFIG}
+        resizable={RESIZABLE_CONFIG}
         onDrag={(e) => {
           if (!isDraggingRef.current) {
             useGridStore.getState().actions.setDraggingComponentId(e.target.id);
@@ -1196,6 +1196,11 @@ const SubWidgetWrapper = ({
           useGridStore.getState().actions.setResizingComponentId(e.target.id);
           e.setMin([gridWidth, 10]);
         }}
+        snapGridWidth={gridWidth}
+        snapGridHeight={10}
+        snapDirections={['top', 'left', 'right', 'bottom']}
+        maxSnapElementGapDistance={10}
+        displayAroundControls={true}
       />
     </div>
   );

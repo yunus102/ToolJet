@@ -1213,10 +1213,10 @@ const WidgetWrapper = ({
           // hideDefaultLines={!isWidgetActive}
           target={targetRef}
           ables={[MouseCustomAble, DimensionViewable]}
-          // resizable={RESIZABLE_CONFIG}
-          resizable={true}
+          resizable={RESIZABLE_CONFIG}
+          // resizable={true}
           draggable={true}
-          renderDirections={['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se']}
+          // renderDirections={['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se']}
           flushSync={flushSync}
           throttleDrag={1}
           edgeDraggable={false}
@@ -1557,8 +1557,8 @@ const WidgetWrapper = ({
           }}
           snapGridWidth={gridWidth}
           snapGridHeight={10}
-          horizontalGuidelines={Array.from({ length: 100 }, (_, i) => i * 10)}
-          verticalGuidelines={Array.from({ length: 100 }, (_, i) => i * gridWidth)}
+          snapDirections={['top', 'left', 'right', 'bottom']}
+          maxSnapElementGapDistance={10}
           bounds={CANVAS_BOUNDS}
           displayAroundControls={true}
         />
