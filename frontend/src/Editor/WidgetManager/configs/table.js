@@ -284,6 +284,7 @@ export const tableConfig = {
     onCellValueChanged: { displayName: 'Cell value changed' },
     onFilterChanged: { displayName: 'Filter changed' },
     onNewRowsAdded: { displayName: 'Add new rows' },
+    onTableDataDownload: { displayName: 'Download data' },
   },
   styles: {
     textColor: {

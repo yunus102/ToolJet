@@ -187,6 +187,7 @@ export function Table({
   const [hoverAdded, setHoverAdded] = useState(false);
   const [generatedColumn, setGeneratedColumn] = useState([]);
   const [isCellValueChanged, setIsCellValueChanged] = useState(false);
+  const [isDownloadTableDataEventAssociated, setIsDownloadTableDataEventAssociated] = useState(false);
 
   const mergeToTableDetails = (payload) => dispatch(reducerActions.mergeToTableDetails(payload));
   const mergeToFilterDetails = (payload) => dispatch(reducerActions.mergeToFilterDetails(payload));
@@ -212,6 +213,9 @@ export function Table({
   );
 
   useEffect(() => {
+    const isDownloadTableDataEventAssociated = tableEvents.some((event) => event?.name === 'onTableDataDownload');
+    if (isDownloadTableDataEventAssociated) setIsDownloadTableDataEventAssociated(true);
+    else setIsDownloadTableDataEventAssociated(false);
     const hoverEvent = tableEvents?.find(({ event }) => {
       return event?.eventId == 'onRowHovered';
     });
@@ -1807,32 +1811,57 @@ export function Table({
               )}
               {!loadingState && showDownloadButton && (
                 <div>
-                  <Tooltip id="tooltip-for-download" className="tooltip" />
-                  <OverlayTriggerComponent
-                    trigger="click"
-                    overlay={downlaodPopover()}
-                    rootClose={true}
-                    placement={'top-end'}
-                  >
-                    <ButtonSolid
-                      variant="ghostBlack"
-                      className={`tj-text-xsm `}
-                      customStyles={{
-                        minWidth: '32px',
-                      }}
-                      leftIcon="filedownload"
-                      fill={`var(--icons-default)`}
-                      iconWidth="16"
-                      size="md"
-                      data-tooltip-id="tooltip-for-download"
-                      data-tooltip-content="Download"
-                      onClick={(e) => {
-                        if (document.activeElement === e.currentTarget) {
-                          e.currentTarget.blur();
-                        }
-                      }}
-                    ></ButtonSolid>
-                  </OverlayTriggerComponent>
+                  {
+                    // if server side pagination is enabled and download event is associated with the table, then directly fire download event without displaying popover
+                    isDownloadTableDataEventAssociated && !clientSidePagination ? (
+                      <>
+                        <Tooltip id="tooltip-for-download-serverside-pagingation" className="tooltip" />
+                        <ButtonSolid
+                          variant="ghostBlack"
+                          className={`tj-text-xsm `}
+                          customStyles={{
+                            minWidth: '32px',
+                          }}
+                          leftIcon="filedownload"
+                          fill={`var(--icons-default)`}
+                          iconWidth="16"
+                          size="md"
+                          data-tooltip-id="tooltip-for-download-serverside-pagingation"
+                          data-tooltip-content="Download"
+                          onClick={() => fireEvent('onTableDataDownload')}
+                        ></ButtonSolid>
+                      </>
+                    ) : (
+                      <>
+                        <Tooltip id="tooltip-for-download" className="tooltip" />
+                        <OverlayTriggerComponent
+                          trigger="click"
+                          overlay={downlaodPopover()}
+                          rootClose={true}
+                          placement={'top-end'}
+                        >
+                          <ButtonSolid
+                            variant="ghostBlack"
+                            className={`tj-text-xsm `}
+                            customStyles={{
+                              minWidth: '32px',
+                            }}
+                            leftIcon="filedownload"
+                            fill={`var(--icons-default)`}
+                            iconWidth="16"
+                            size="md"
+                            data-tooltip-id="tooltip-for-download"
+                            data-tooltip-content="Download"
+                            onClick={(e) => {
+                              if (document.activeElement === e.currentTarget) {
+                                e.currentTarget.blur();
+                              }
+                            }}
+                          ></ButtonSolid>
+                        </OverlayTriggerComponent>
+                      </>
+                    )
+                  }
                 </div>
               )}
               {!loadingState && !hideColumnSelectorButton && (

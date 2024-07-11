@@ -894,6 +894,7 @@ export async function onEvent(_ref, eventName, events, options = {}, mode = 'edi
       'onOpen',
       'onClose',
       'onRowClicked',
+      'onTableDataDownload',
       'onRecordClicked',
       'onCancelChanges',
       'onSort',
