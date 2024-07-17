@@ -283,7 +283,7 @@ class OrganizationLogin extends React.Component {
                       <label className="form-label bold-text" data-cy="workspace-login-url-label">
                         {t('header.organization.menus.manageSSO.generalSettings.loginUrl', `Login URL`)}
                       </label>
-                      <div className="d-flex justify-content-between form-control align-items-center">
+                      <div className="d-flex justify-content-between form-control-org-login align-items-center">
                         <p id="login-url" data-cy="workspace-login-url">
                           {`${window.public_config?.TOOLJET_HOST}${
                             window.public_config?.SUB_PATH ? window.public_config?.SUB_PATH : '/'
@@ -319,7 +319,7 @@ class OrganizationLogin extends React.Component {
                       </label>
                       <div className="help-text danger-text-login">
                         <div data-cy="enable-sign-up-helper-text">
-                          Users will be able to sign up without being invited
+                          Users will be able to sign up as end-users without being invited
                         </div>
                       </div>
                     </div>
