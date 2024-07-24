@@ -32,7 +32,6 @@ function InviteUsersForm({
   const [activeTab, setActiveTab] = useState(1);
   const [existingGroups, setExistingGroups] = useState([]);
   const [newRole, setNewRole] = useState(null);
-
   const customGroups = groups.filter((group) => group.groupType === 'custom');
   const roleGroups = groups
     .filter((group) => group.groupType === 'default')
@@ -44,6 +43,7 @@ function InviteUsersForm({
       return indexA - indexB;
     });
   const [isChangeRoleModalOpen, setIsChangeRoleModalOpen] = useState(false);
+  const [fileUpload, setFileUpload] = useState(false);
   const groupedOptions = [
     {
       label: 'default',
@@ -55,6 +55,9 @@ function InviteUsersForm({
     },
   ];
   const [selectedGroups, setSelectedGroups] = useState([]);
+  useEffect(() => {
+    setFileUpload(false);
+  }, [activeTab]);
 
   const hiddenFileInput = useRef(null);
 
@@ -87,6 +90,7 @@ function InviteUsersForm({
       toast.error('File size cannot exceed more than 1MB');
     } else {
       handleFileChange(file);
+      setFileUpload(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -312,7 +316,9 @@ function InviteUsersForm({
                       ToolJet won’t be able to recognise files in any other format.{' '}
                     </p>
                     <ButtonSolid
-                      href="../../assets/csv/sample_upload.csv"
+                      href={`${window.public_config?.TOOLJET_HOST}${
+                        window.public_config?.SUB_PATH ? window.public_config?.SUB_PATH : '/'
+                      }assets/csv/sample_upload.csv`}
                       download="sample_upload.csv"
                       variant="tertiary"
                       className="download-template-btn"
@@ -333,6 +339,7 @@ function InviteUsersForm({
                 handleFileChange={handleFileChange}
                 inviteBulkUsers={inviteBulkUsers}
                 onDrop={onDrop}
+                setFileUpload={setFileUpload}
               />
             </div>
           )}
@@ -352,7 +359,7 @@ function InviteUsersForm({
               form={activeTab == 1 ? 'inviteByEmail' : 'inviteBulkUsers'}
               type="submit"
               variant="primary"
-              disabled={uploadingUsers || creatingUser || !isEdited()}
+              disabled={uploadingUsers || creatingUser || !isEdited() || (activeTab !== 1 && !fileUpload)}
               data-cy={activeTab == 1 ? 'button-invite-users' : 'button-upload-users'}
               leftIcon={activeTab == 1 ? 'sent' : 'fileupload'}
               width="20"

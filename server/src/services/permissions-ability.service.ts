@@ -16,7 +16,7 @@ import {
 import { GranularPermissions } from 'src/entities/granular_permissions.entity';
 import { TOOLJET_RESOURCE } from 'src/constants/global.constant';
 import { getUserPermissionsQuery } from '@module/permissions/utility/permission-ability.utility';
-import { App } from 'src/entities/app.entity';
+import { AppBase } from 'src/entities/app_base.entity';
 
 @Injectable()
 export class AbilityService {
@@ -61,24 +61,35 @@ export class AbilityService {
     appsGranularPermissions: GranularPermissions[],
     user: User
   ): Promise<UserAppsPermissions> {
-    const userAppsPermissions: UserAppsPermissions = appsGranularPermissions.reduce((acc, permission) => {
+    const userAppsPermissions: UserAppsPermissions = { ...DEFAULT_USER_APPS_PERMISSIONS };
+
+    appsGranularPermissions.forEach((permission) => {
       const appsPermission = permission?.appsGroupPermissions;
+
       const groupApps = appsPermission?.groupApps ? appsPermission.groupApps.map((item) => item.appId) : [];
-      return {
-        isAllEditable: acc.isAllEditable || (permission.isAll && appsPermission?.canEdit),
-        editableAppsId: Array.from(new Set([...acc.editableAppsId, ...(appsPermission?.canEdit ? groupApps : [])])),
-        isAllViewable: acc.isAllViewable || (permission.isAll && appsPermission?.canView),
-        viewableAppsId: Array.from(new Set([...acc.viewableAppsId, ...(appsPermission?.canView ? groupApps : [])])),
-        hiddenAppsId: Array.from(
-          new Set([...acc.hiddenAppsId, ...(appsPermission?.hideFromDashboard ? groupApps : [])])
-        ),
-        hideAll: acc.hideAll || (appsPermission.hideFromDashboard && permission.isAll),
-      };
-    }, DEFAULT_USER_APPS_PERMISSIONS);
+
+      userAppsPermissions.isAllEditable =
+        userAppsPermissions.isAllEditable || (permission.isAll && appsPermission?.canEdit);
+      userAppsPermissions.editableAppsId = Array.from(
+        new Set([...userAppsPermissions.editableAppsId, ...(appsPermission?.canEdit ? groupApps : [])])
+      );
+      userAppsPermissions.isAllViewable =
+        userAppsPermissions.isAllViewable || (permission.isAll && appsPermission?.canView);
+      userAppsPermissions.viewableAppsId = Array.from(
+        new Set([...userAppsPermissions.viewableAppsId, ...(appsPermission?.canView ? groupApps : [])])
+      );
+      userAppsPermissions.hiddenAppsId = Array.from(
+        new Set([...userAppsPermissions.hiddenAppsId, ...(appsPermission?.hideFromDashboard ? groupApps : [])])
+      );
+      userAppsPermissions.hideAll =
+        userAppsPermissions.hideAll || (appsPermission?.hideFromDashboard && permission.isAll);
+    });
+
     await dbTransactionWrap(async (manager: EntityManager) => {
-      const appsOwnedByUser = await manager.find(App, {
+      const appsOwnedByUser = await manager.find(AppBase, {
         where: { userId: user.id, organizationId: user.organizationId },
       });
+
       const appsIdOwnedByUser = appsOwnedByUser.map((app) => app.id);
       userAppsPermissions.editableAppsId = Array.from(
         new Set([...userAppsPermissions.editableAppsId, ...appsIdOwnedByUser])
