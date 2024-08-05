@@ -465,7 +465,6 @@ function showModal(_ref, modal, show) {
     console.log('No modal is associated with this event.');
     return Promise.resolve();
   }
-  useEditorStore.getState().actions.updateComponentsNeedsUpdateOnNextRender([modalId]);
   const modalMeta = _ref.appDefinition.pages[_ref.currentPageId].components[modalId]; //! NeedToFix
 
   const _components = {
@@ -478,6 +477,7 @@ function showModal(_ref, modal, show) {
   useCurrentStateStore.getState().actions.setCurrentState({
     components: _components,
   });
+  useEditorStore.getState().actions.updateComponentsNeedsUpdateOnNextRender([modalId]);
   return Promise.resolve();
 }
 
@@ -522,7 +522,9 @@ function executeActionWithDebounce(_ref, event, mode, customVariables) {
     }
     switch (event.actionId) {
       case 'show-alert': {
-        const message = resolveReferences(event.message, undefined, customVariables);
+        let message = resolveReferences(event.message, undefined, customVariables);
+        if (typeof message === 'object') message = JSON.stringify(message);
+
         switch (event.alertType) {
           case 'success':
           case 'error':
@@ -645,6 +647,8 @@ function executeActionWithDebounce(_ref, event, mode, customVariables) {
           variables: customAppVariables,
         });
 
+        useResolveStore.getState().actions.resetHintsByKey(`variables.${key}`);
+
         return resp;
       }
 
@@ -683,12 +687,16 @@ function executeActionWithDebounce(_ref, event, mode, customVariables) {
           },
         });
 
-        return useCurrentStateStore.getState().actions.setCurrentState({
+        const resp = useCurrentStateStore.getState().actions.setCurrentState({
           page: {
             ...getCurrentState().page,
             variables: customPageVariables,
           },
         });
+
+        useResolveStore.getState().actions.resetHintsByKey(`page.variables.${key}`);
+
+        return resp;
       }
 
       case 'get-page-variable': {
@@ -1148,11 +1156,9 @@ export function runQuery(
   shouldSetPreviewData = false,
   isOnLoad = false
 ) {
-  //for resetting the hints when the query is run for large number of items
-  if (mode == 'edit') {
-    const resolveStoreActions = useResolveStore.getState().actions;
-    resolveStoreActions.resetHintsByKey(`queries.${queryName}`);
-  }
+  //for resetting the hints when the query is run for large number of items and also child attributes
+  const resolveStoreActions = useResolveStore.getState().actions;
+  resolveStoreActions.resetHintsByKey(`queries.${queryName}`);
 
   let parameters = userSuppliedParameters;
   const query = useDataQueriesStore.getState().dataQueries.find((query) => query.id === queryId);

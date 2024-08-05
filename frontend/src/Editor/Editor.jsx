@@ -621,7 +621,15 @@ const EditorComponent = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleRunQuery = (queryId, queryName) => runQuery(getEditorRef(), queryId, queryName);
+  const handleRunQuery = (queryId, queryName, additionalArgs = {}) => {
+    const {
+      confirmed = undefined,
+      mode = 'edit',
+      userSuppliedParameters = {},
+      shouldSetPreviewData = false,
+    } = additionalArgs;
+    runQuery(getEditorRef(), queryId, queryName, confirmed, mode, userSuppliedParameters, shouldSetPreviewData);
+  };
 
   const dataSourceModalHandler = () => {
     dataSourceModalRef.current.dataSourceModalToggleStateHandler();
@@ -1704,6 +1712,7 @@ const EditorComponent = (props) => {
 
     if (currentPageId === pageId && pageHandle === appDefinition?.pages[pageId]?.handle) {
       useEditorStore.getState().actions.setPageProgress(false);
+      useCurrentStateStore.getState().actions.setEditorReady(true);
       return;
     }
     const { name, handle } = appDefinition.pages[pageId];
@@ -2065,7 +2074,9 @@ const EditorComponent = (props) => {
                 }}
                 setSelectedComponent={setSelectedComponent}
                 removeComponent={removeComponent}
-                runQuery={(queryId, queryName) => handleRunQuery(queryId, queryName)}
+                runQuery={(queryId, queryName, additionalArgs = {}) =>
+                  handleRunQuery(queryId, queryName, additionalArgs)
+                }
                 ref={dataSourceModalRef}
                 currentPageId={currentPageId}
                 addNewPage={addNewPage}
