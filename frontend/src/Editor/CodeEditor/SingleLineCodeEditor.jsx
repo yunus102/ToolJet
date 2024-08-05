@@ -15,7 +15,7 @@ import { DynamicFxTypeRenderer } from './DynamicFxTypeRenderer';
 import { resolveReferences } from './utils';
 import { okaidia } from '@uiw/codemirror-theme-okaidia';
 import { githubLight } from '@uiw/codemirror-theme-github';
-import { getAutocompletion } from './autocompleteExtensionConfig';
+import { getAutocompletion, hasBalancedBraces } from './autocompleteExtensionConfig';
 import ErrorBoundary from '../ErrorBoundary';
 import CodeHinter from './CodeHinter';
 import { EditorContext } from '../Context/EditorContextWrapper';
@@ -146,6 +146,10 @@ const EditorInput = ({
 
     let queryInput = context.state.doc.toString();
     const originalQueryInput = queryInput;
+
+    if (!hasBalancedBraces(queryInput)) {
+      return null; // Return null to prevent showing suggestions
+    }
 
     if (totalReferences > 0) {
       const currentCursor = context.state.selection.main.head;
