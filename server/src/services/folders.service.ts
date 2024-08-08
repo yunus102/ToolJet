@@ -2,22 +2,23 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FolderApp } from 'src/entities/folder_app.entity';
 import { getFolderQuery } from 'src/helpers/queries';
-import { createQueryBuilder, EntityManager, Repository, UpdateResult } from 'typeorm';
+
 import { User } from '../../src/entities/user.entity';
 import { Folder } from '../entities/folder.entity';
-import { catchDbException, dbTransactionWrap } from 'src/helpers/utils.helper';
+import { catchDbException } from 'src/helpers/utils.helper';
 import { DataBaseConstraints } from 'src/helpers/db_constraints.constants';
 import { AppBase } from 'src/entities/app_base.entity';
 import { TOOLJET_RESOURCE } from 'src/constants/global.constant';
 import { AbilityService } from './permissions-ability.service';
+import { dbTransactionWrap } from 'src/helpers/database.helper';
+import { EntityManager, Repository, UpdateResult } from 'typeorm';
+import { UserAppsPermissions } from '@module/permissions/interface/permissions-ability.interface';
 
 @Injectable()
 export class FoldersService {
   constructor(
     @InjectRepository(Folder)
     private foldersRepository: Repository<Folder>,
-    @InjectRepository(FolderApp)
-    private folderAppsRepository: Repository<FolderApp>,
 
     private abilityService: AbilityService
   ) {}
@@ -41,30 +42,45 @@ export class FoldersService {
     }, [{ dbConstraint: DataBaseConstraints.FOLDER_NAME_UNIQUE, message: 'This folder name is already taken.' }]);
   }
 
-  async allFolders(user: User, searchKey?: string): Promise<Folder[]> {
-    return await getFolderQuery(user.organizationId, searchKey).distinct().getMany();
+  async allFolders(user: User, userAppPermissions: UserAppsPermissions, searchKey?: string): Promise<Folder[]> {
+    return await dbTransactionWrap(async (manager: EntityManager) => {
+      return await getFolderQuery(user.organizationId, manager, userAppPermissions, searchKey).distinct().getMany();
+    });
   }
 
   async all(user: User, searchKey: string): Promise<Folder[]> {
-    const allFolderList = await this.allFolders(user);
+    const userAppPermissions = (
+      await this.abilityService.resourceActionsPermission(user, {
+        resources: [{ resource: TOOLJET_RESOURCE.APP }],
+        organizationId: user.organizationId,
+      })
+    ).App;
+
+    const allFolderList = await this.allFolders(user, userAppPermissions);
     if (!searchKey || allFolderList.length === 0) {
       return allFolderList;
     }
-    const folders = await this.allFolders(user, searchKey);
+
+    const folders = await this.allFolders(user, userAppPermissions, searchKey);
+
     allFolderList.forEach((folder, index) => {
       const currentFolder = folders.find((f) => f.id === folder.id);
       if (currentFolder) {
         allFolderList[index] = currentFolder;
+        allFolderList[index].folderApps;
+        allFolderList[index].generateCount();
+        console.log('folder found');
       } else {
         allFolderList[index].folderApps = [];
         allFolderList[index].generateCount();
+        console.log('folder  not found');
       }
     });
     return allFolderList;
   }
 
   async findOne(folderId: string): Promise<Folder> {
-    return await this.foldersRepository.findOneOrFail(folderId);
+    return await this.foldersRepository.findOneOrFail({ where: { id: folderId } });
   }
 
   async getAppsFor(
@@ -117,7 +133,8 @@ export class FoldersService {
 
       const viewableAppIds = [null, ...viewableAppsTotal.filter((id) => folderAppIds.includes(id))];
 
-      const viewableAppsInFolder = createQueryBuilder(AppBase, 'apps')
+      const viewableAppsInFolder = manager
+        .createQueryBuilder(AppBase, 'apps')
         .innerJoin('apps.user', 'user')
         .addSelect(['user.firstName', 'user.lastName']);
 
@@ -142,7 +159,7 @@ export class FoldersService {
   }
 
   async delete(user: User, id: string) {
-    const folder = await this.foldersRepository.findOneOrFail({ id, organizationId: user.organizationId });
+    const folder = await this.foldersRepository.findOneOrFail({ where: { id, organizationId: user.organizationId } });
     return await this.foldersRepository.delete({ id: folder.id, organizationId: user.organizationId });
   }
 }

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Avatar from '@/_ui/Avatar';
-import Skeleton from 'react-loading-skeleton';
 import cx from 'classnames';
 import { Pagination } from '@/_components';
 import SolidIcon from '@/_ui/Icon/SolidIcons';
@@ -10,6 +9,7 @@ import UsersActionMenu from './UsersActionMenu';
 import { humanizeifDefaultGroupName, decodeEntities } from '@/_helpers/utils';
 import { ToolTip } from '@/_components/ToolTip';
 
+import Spinner from 'react-bootstrap/Spinner';
 const UsersTable = ({
   isLoading,
   users,
@@ -28,14 +28,14 @@ const UsersTable = ({
   return (
     <div className="workspace-settings-table-wrap mb-4">
       <div className="tj-user-table-wrapper">
-        <div className="card-table fixedHeader table-responsive  ">
+        <div className="card-table fixedHeader table-responsive">
           <table data-testid="usersTable" className="users-table table table-vcenter h-100">
             <thead>
               <tr>
                 <th data-cy="users-table-name-column-header">
                   {translator('header.organization.menus.manageUsers.name', 'Name')}
                 </th>
-                <th data-cy="users-table-groups-column-header" data-name="role-header">
+                <th data-cy="users-table-roles-column-header" data-name="role-header">
                   User role
                 </th>
                 <th data-cy="users-table-groups-column-header">Custom groups</th>
@@ -52,38 +52,22 @@ const UsersTable = ({
               </tr>
             </thead>
             {isLoading ? (
-              <tbody className="w-100 h-auto">
-                {Array.from(Array(4)).map((_item, index) => (
-                  <tr key={index}>
-                    <td className="col-2 p-3">
-                      <div className="d-flex align-items-center">
-                        <Skeleton circle="15%" className="col-auto" style={{ width: '35px', height: '35px' }} />
-                        <Skeleton className="mx-3" width={100} />
-                      </div>
-                    </td>
-                    <td className="col-4 p-3">
-                      <Skeleton />
-                    </td>
-                    {users && users[0]?.status && (
-                      <td className="col-2 p-3">
-                        <Skeleton />
-                      </td>
-                    )}
-                    <td className="text-muted col-auto col-1 pt-3">
-                      <Skeleton />
-                    </td>
-                    <td className="text-muted col-auto col-1 pt-3">
-                      <Skeleton />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 'calc(100vh - 270px)',
+                }}
+              >
+                <Spinner variant="primary" />
+              </div>
             ) : (
               <tbody>
                 {Array.isArray(users) &&
                   users.length > 0 &&
                   users.map((user) => (
-                    <tr key={user.id}>
+                    <tr key={user.id} data-cy={`${user.name.toLowerCase().replace(/\s+/g, '-')}-user-row`}>
                       <td>
                         <Avatar
                           avatarId={user.avatar_id}
@@ -98,7 +82,11 @@ const UsersTable = ({
                           >
                             {decodeEntities(user.name)}
                           </span>
-                          <span style={{ color: '#687076' }} className="user-email mx-3  tj-text-xsm">
+                          <span
+                            style={{ color: '#687076' }}
+                            className="user-email mx-3  tj-text-xsm"
+                            data-cy={`${user.name.toLowerCase().replace(/\s+/g, '-')}-user-email`}
+                          >
                             {user.email}
                           </span>
                         </div>

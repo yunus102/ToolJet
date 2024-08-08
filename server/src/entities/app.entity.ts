@@ -1,9 +1,5 @@
 import {
   Entity,
-  AfterLoad,
-  AfterInsert,
-  getRepository,
-  getManager,
   Column,
   CreateDateColumn,
   JoinColumn,
@@ -28,6 +24,8 @@ export class App extends BaseEntity {
 
   @Column({ name: 'name' })
   name: string;
+
+  type: string = 'front-end';
 
   @Column({ name: 'slug', unique: true })
   slug: string;
@@ -86,20 +84,4 @@ export class App extends BaseEntity {
   appGroupPermissions: AppGroupPermission[];
 
   public editingVersion;
-
-  @AfterInsert()
-  async updateSlug(): Promise<void> {
-    if (!this.slug) {
-      const appRepository = getRepository(App);
-      await appRepository.update(this.id, { slug: this.id });
-    }
-  }
-
-  @AfterLoad()
-  async afterLoad(): Promise<void> {
-    this.editingVersion = await getManager().findOne(AppVersion, {
-      where: { appId: this.id },
-      order: { updatedAt: 'DESC' },
-    });
-  }
 }

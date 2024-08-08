@@ -11,6 +11,7 @@ import AppResourcePermissions from '@/ManageGranularAccess/AppResourcePermission
 import AddResourcePermissionsMenu from '@/ManageGranularAccess/AddResourcePermissionsMenu';
 import { ConfirmDialog } from '@/_components';
 import AddEditResourcePermissionsModal from '@/ManageGranularAccess/AddEditResourceModal/AddEditResourcePermissionsModal';
+import Spinner from 'react-bootstrap/Spinner';
 
 import { ToolTip } from '@/_components/ToolTip';
 class ManageGranularAccessComponent extends React.Component {
@@ -131,6 +132,7 @@ class ManageGranularAccessComponent extends React.Component {
       .then(() => {
         this.fetchGranularPermissions(this.props.groupPermissionId);
         this.closeAddPermissionModal();
+        toast.success('Permission created successfully!');
       })
       .catch(({ error }) => {
         this.closeAddPermissionModal();
@@ -435,7 +437,7 @@ class ManageGranularAccessComponent extends React.Component {
               <span className="font-weight-500">
                 <SolidIcon name="apps" />
               </span>
-              <div className="tj-text-md font-weight-500" data-cy="user-email">
+              <div className="tj-text-md font-weight-500" data-cy="modal-title">
                 {modalTitle}
               </div>
               {modalType === 'edit' && !isRoleGroup && (
@@ -451,6 +453,7 @@ class ManageGranularAccessComponent extends React.Component {
                         showAddPermissionModal: false,
                       });
                     }}
+                    data-cy="delete-button"
                   />
                 </div>
               )}
@@ -468,13 +471,15 @@ class ManageGranularAccessComponent extends React.Component {
           addableApps={addableApps}
           darkMode={this.props.darkMode}
         />
-        {!granularPermissions.length ? (
+        {!granularPermissions.length && !isLoading ? (
           <div className="empty-container">
-            <div className="icon-container">
+            <div className="icon-container" data-cy="empty-page-svg">
               <SolidIcon name="granularaccess" />
             </div>
-            <p className="my-2 tj-text-md font-weight-500">No permissions added yet</p>
-            <p className="tj-text-xsm mb-2">
+            <p className="my-2 tj-text-md font-weight-500" data-cy="empty-page-title">
+              No permissions added yet
+            </p>
+            <p className="tj-text-xsm mb-2" data-cy="empty-page-info-text">
               Add assets to configure granular, asset-level permissions for this user group
             </p>
             <div className="menu">
@@ -489,31 +494,24 @@ class ManageGranularAccessComponent extends React.Component {
           <>
             {showPermissionInfo && this.showPermissionText(currentGroupPermission)}
             <div className="manage-granular-permission-header">
-              <p data-cy="resource-header" className="tj-text-xsm">
+              <p data-cy="name-header" className="tj-text-xsm">
                 {'Name'}
               </p>
               <p data-cy="permissions-header" className="tj-text-xsm">
                 {'Permission'}
               </p>
-              <p data-cy="permissions-header" className="tj-text-xsm">
+              <p data-cy="resource-header" className="tj-text-xsm">
                 {'Resource'}
               </p>
             </div>
             <div className={showPermissionInfo ? 'permission-body-one' : 'permission-body-two'}>
               {isLoading ? (
-                <tr>
-                  <td className="col-auto">
-                    <div className="row">
-                      <div className="skeleton-line w-10 col mx-3"></div>
-                    </div>
-                  </td>
-                  <td className="col-auto">
-                    <div className="skeleton-line w-10"></div>
-                  </td>
-                  <td className="col-auto">
-                    <div className="skeleton-line w-10"></div>
-                  </td>
-                </tr>
+                <div
+                  className="d-flex justify-content-center align-items-center"
+                  style={{ height: 'calc(100vh - 470px)' }}
+                >
+                  <Spinner variant="primary" />
+                </div>
               ) : (
                 <>
                   {granularPermissions.map((permissions, index) => (

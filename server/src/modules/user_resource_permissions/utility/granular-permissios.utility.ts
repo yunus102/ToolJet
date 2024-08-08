@@ -11,7 +11,8 @@ export function validateGranularPermissionCreateOperation(group: GroupPermission
     throw new BadRequestException(ERROR_HANDLER.ADMIN_DEFAULT_GROUP_GRANULAR_PERMISSIONS);
 }
 
-export function validateGranularPermissionUpdateOperation(group: GroupPermissions) {
+export function validateGranularPermissionUpdateOperation(group: GroupPermissions, organizationId: string) {
+  if (group.organizationId !== organizationId) throw new BadRequestException(ERROR_HANDLER.GROUP_DOES_NOT_EXIST);
   if (group.name === USER_ROLE.ADMIN)
     throw new BadRequestException(ERROR_HANDLER.ADMIN_DEFAULT_GROUP_GRANULAR_PERMISSIONS);
 }

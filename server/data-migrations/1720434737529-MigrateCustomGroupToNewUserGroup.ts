@@ -205,11 +205,7 @@ export class MigrateCustomGroupToNewUserGroup1720434737529 implements MigrationI
     const nameInit = createResourcePermissionObj.canView ? 'Viewable' : 'Updatable';
     if (appsPermissions.length === 0) return;
     const dtoObject = {
-<<<<<<< HEAD
-      name: `'${nameInit} ${DEFAULT_GRANULAR_PERMISSIONS_NAME[resource]}'`,
-=======
       name: `${nameInit} ${DEFAULT_GRANULAR_PERMISSIONS_NAME[resource]}`,
->>>>>>> group-revamp-fix_krit
       groupId: group.id,
       type: resource as ResourceType,
       isAll: false,
