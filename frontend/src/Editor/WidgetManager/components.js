@@ -26,15 +26,18 @@ const combineProperties = (widget, universal, isArray = false) => {
   return {
     ...universal,
     ...widget,
-    properties: { ...universal.properties, ...widget.properties },
-    general: { ...universal.general, ...widget.general },
-    others: { ...universal.others, ...widget.others },
-    events: isArray ? [...universal.events, ...widget.events] : { ...universal.events, ...widget.events },
-    styles: { ...universal.styles, ...widget.styles },
-    generalStyles: { ...universal.generalStyles, ...widget.generalStyles },
-    exposedVariables: { ...universal.exposedVariables, ...widget.exposedVariables },
+    properties: { ...universal?.properties, ...widget?.properties },
+    general: { ...universal?.general, ...widget?.general },
+    others: { ...universal?.others, ...widget?.others },
+    events: isArray
+      ? [...(universal?.events || []), ...(widget?.events || [])]
+      : { ...universal?.events, ...widget?.events },
+    styles: { ...universal?.styles, ...widget?.styles },
+    generalStyles: { ...universal?.generalStyles, ...widget?.generalStyles },
+    exposedVariables: { ...universal?.exposedVariables, ...widget?.exposedVariables },
   };
 };
+console.log('widgets--', widgets);
 
 export const componentTypes = widgets.map((widget) => {
   return {

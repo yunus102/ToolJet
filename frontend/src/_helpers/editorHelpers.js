@@ -44,6 +44,7 @@ import { Html } from '@/Editor/Components/Html';
 import { ButtonGroup } from '@/Editor/Components/ButtonGroup';
 import { CustomComponent } from '@/Editor/Components/CustomComponent/CustomComponent';
 import { VerticalDivider } from '@/Editor/Components/verticalDivider';
+import JSONViewer from '@/Editor/Components/JsonViewer';
 import { ColorPicker } from '@/Editor/Components/ColorPicker';
 import { KanbanBoard } from '@/Editor/Components/KanbanBoard/KanbanBoard';
 import { Kanban } from '@/Editor/Components/Kanban/Kanban';
@@ -129,6 +130,7 @@ export const AllComponents = {
   Form,
   BoundedBox,
   ToggleSwitchV2,
+  JSONViewer,
 };
 if (isPDFSupported()) {
   AllComponents.PDF = await import('@/Editor/Components/PDF').then((module) => module.PDF);
