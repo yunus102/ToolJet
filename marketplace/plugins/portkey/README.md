@@ -1,4 +1,4 @@
 
 # Portkey
 
-Documentation on: https://docs.tooljet.com/docs/data-sources/portkey
+Documentation on: https://docs.tooljet.com/docs/marketplace/plugins/marketplace-plugin-portkey
