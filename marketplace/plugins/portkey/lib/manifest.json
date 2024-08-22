@@ -34,15 +34,13 @@
       "label": "API Key",
       "key": "apiKey",
       "type": "password",
-      "description": "Enter your Portkey API Key",
-      "helpText": "How to obtain API Key: <a href='https://docs.portkey.ai/docs/api-reference/authentication#obtaining-your-api-key' target='_blank' rel='noreferrer'>See here</a>"
+      "description": "Enter your Portkey API Key"
     },
     "virtualKey": {
       "label": "Default Virtual Key",
       "key": "virtualKey",
       "type": "password",
-      "description": "Enter your default Portkey Virtual Key",
-      "helpText": "How to create Virtual Key: <a href='https://docs.portkey.ai/docs/product/ai-gateway-streamline-llm-integrations/virtual-keys#creating-virtual-keys' target='_blank' rel='noreferrer'>See here</a>"
+      "description": "Enter your default Portkey Virtual Key"
     },
     "config": {
       "label": "Config",
@@ -54,8 +52,7 @@
       "label": "Gateway URL",
       "key": "gatewayUrl",
       "type": "text",
-      "description": "Enter your default Portkey Gateway URL",
-      "helpText": "How to obtain Gateway URL: <a href='https://docs.portkey.ai/docs/api-reference/authentication#obtaining-your-api-key' target='_blank' rel='noreferrer'>See here</a>"
+      "description": "Enter your default Portkey Gateway URL"
     }
   },
   "required": [
