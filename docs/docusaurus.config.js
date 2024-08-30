@@ -122,33 +122,11 @@ module.exports = {
           // Please change this to your repo.
           editUrl: 'https://github.com/ToolJet/Tooljet/blob/develop/docs/',
           includeCurrentVersion: false,
-          lastVersion: '2.50.0-LTS',
-          versions: {
-            '2.61.0': {
-              banner: 'none'
-            },
-            '2.62.0': {
-              banner: 'none'
-            },
-            '2.65.0': {
-              banner: 'none'
-            }
-          }
+          lastVersion: '2.62.0'
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
-        },
-        sitemap: {
-          changefreq: 'weekly',
-          priority: 0.5,
-          ignorePatterns: ['/docs/1.x.x/**'],
-          filename: 'sitemap.xml',
-        },
-        googleTagManager: isProd
-          ? {
-            containerId: process.env.GTM || 'development',
-          }
-          : undefined,
+        }
       },
     ],
   ],
