@@ -301,7 +301,6 @@ async function issueWorklogs(queryOptions: QueryOptions, client: JiraClient) {
       maxResults: returnNumber(queryOptions.max_results),
       startedAfter: returnNumber(queryOptions.started_after),
       startedBefore: returnNumber(queryOptions.started_before),
-      expand: queryOptions.expand,
     })
     .then((res) => {
       returnValue = res;
@@ -382,8 +381,8 @@ async function getAllBoards(queryOptions: QueryOptions, client: JiraClient) {
       projectKeyOrId: queryOptions.project_key,
       startAt: queryOptions.start_at,
       maxResults: queryOptions.max_results,
+      name: queryOptions.project_name,
       expand: queryOptions.expand,
-      ...returnObject(queryOptions.properties),
     })
     .then((res) => {
       returnValue = res;

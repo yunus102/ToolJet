@@ -75,7 +75,7 @@
           "key": "properties",
           "type": "codehinter",
           "mode": "javascript",
-          "placeholder": "{\n\"fields\": {\n   \"summary\": \"REST EXAMPLE\",\n   \"description\": \"Creating an issue via REST API\",\n   \"issuetype\": {\n    \"name\": \"Bug\"\n   }\n  }\n}",
+          "placeholder": "{\n  \"fields\": \"summary, description, created, ...\"\n  \"expand\": \"renderedFields, names, schema, transitions, operations, editmeta, changelog, versionedRepresentations\"\n  \"properties\": \"...\"\n  \"updateHistory\": \"...\"\n}",
           "description": "Enter query properties",
           "height": "200px"
         }
@@ -86,7 +86,7 @@
           "key": "properties",
           "type": "codehinter",
           "mode": "javascript",
-          "placeholder": "{\n\"fields\": {\n   \"project\":\n   { \n      \"key\": \"KFTT\"\n   },\n   \"summary\": \"REST EXAMPLE\",\n   \"description\": \"Creating an issue via REST API\",\n   \"issuetype\": {\n    \"name\": \"Story\"\n   ...",
+          "placeholder": "{\n \"fields\": {\n   \"project\":\n   { \n      \"key\": \"SCRUM\"\n   },\n   \"summary\": \"Something's wrong\",\n   \"description\": \"Creating an issue\",\n   \"issuetype\": {\n    \"name\": \"Bug\"\n   },\n   \"assignee\": {\n    \"name\": \"Jack\"\n   },\n   \"labels\": [\n    \"bugfix\",\n    \"test\"\n   ]\n }\n}",
           "description": "Enter properties",
           "height": "200px"
         }
@@ -146,7 +146,7 @@
           "width": "320px",
           "height": "36px",
           "className": "codehinter-plugins",
-          "placeholder": "5b10ac8d82e05b22cc7d4ef5"
+          "placeholder": "712020:4581444c-054e-41d8-90ed-6d1d849557f7"
         }
       },
       "edit_issue": {
@@ -166,7 +166,7 @@
           "key": "properties",
           "type": "codehinter",
           "mode": "javascript",
-          "placeholder": "{\n\"fields\": {\n   \"summary\": \"REST EXAMPLE\",\n   \"description\": \"Creating an issue via REST API\",\n   \"issuetype\": {\n    \"name\": \"Bug\"\n   }\n  }\n}",
+          "placeholder": "{\n \"fields\": {\n   \"project\":\n   { \n      \"key\": \"SCRUM\"\n   },\n   \"summary\": \"Something's wrong\",\n   \"description\": \"Creating an issue\",\n   \"issuetype\": {\n    \"name\": \"Bug\"\n   },\n   \"assignee\": {\n    \"name\": \"Jack\"\n   },\n   \"labels\": [\n    \"bugfix\",\n    \"test\"\n   ]\n }\n}",
           "description": "Enter properties",
           "height": "200px"
         }
@@ -203,7 +203,7 @@
           "width": "320px",
           "height": "36px",
           "className": "codehinter-plugins",
-          "placeholder": "5b10ac8d82e05b22cc7d4ef5"
+          "placeholder": "712020:4581444c-054e-41d8-90ed-6d1d849557f7"
         },
         "expand": {
           "label": "expand",
@@ -278,7 +278,7 @@
           "width": "320px",
           "height": "36px",
           "className": "codehinter-plugins",
-          "placeholder": "5b10ac8d82e05b22cc7d4ef5"
+          "placeholder": "712020:4581444c-054e-41d8-90ed-6d1d849557f7"
         },
         "project_key": {
           "label": "Project Key",
@@ -422,7 +422,7 @@
           "width": "320px",
           "height": "36px",
           "className": "codehinter-plugins",
-          "placeholder": "0"
+          "placeholder": "Enter worklog start date and time, as a UNIX timestamp in milliseconds"
         },
         "started_before": {
           "label": "Started before",
@@ -433,18 +433,7 @@
           "width": "320px",
           "height": "36px",
           "className": "codehinter-plugins",
-          "placeholder": "0"
-        },
-        "expand": {
-          "label": "expand",
-          "key": "expand",
-          "type": "codehinter",
-          "lineNumbers": false,
-          "description": "Use expand to include additional information about users in the response",
-          "width": "320px",
-          "height": "36px",
-          "className": "codehinter-plugins",
-          "placeholder": "widgets"
+          "placeholder": "Enter worklog start date and time, as a UNIX timestamp in milliseconds"
         }
       },
       "add_worklog": {
@@ -464,7 +453,7 @@
           "key": "properties",
           "type": "codehinter",
           "mode": "javascript",
-          "placeholder": "{\n  \"comment\": {\n    \"content\": [\n      {\n        \"content\": [\n          {\n            \"text\": \"I did some work here.\",\n            \"type\": \"text\"\n          }\n        ],\n        \"type\": \"paragraph\"\n      }\n    ],\n    \"type\": \"doc\",\n    \"version\": 1\n  },...",
+          "placeholder": "{\n  \"comment\": \"I did some work here.\",\n  \"created\": \"2017-03-14T10:35:37.097+0000\",\n  \"id\": \"100028\",\n  \"issueId\": \"SCRUM-1\",\n  \"started\": \"2017-03-14T10:35:37.097+0000\",\n  \"timeSpent\": \"3h 20m\"\n}",
           "description": "Enter properties",
           "height": "200px"
         }
@@ -603,6 +592,17 @@
           "className": "codehinter-plugins",
           "placeholder": "0"
         },
+        "project_name": {
+          "label": "Name",
+          "key": "project_name",
+          "type": "codehinter",
+          "lineNumbers": false,
+          "description": "Enter the name of the JIRA Project",
+          "width": "320px",
+          "height": "36px",
+          "className": "codehinter-plugins",
+          "placeholder": "Enter project name"
+        },
         "max_results": {
           "label": "Max Results",
           "key": "max_results",
@@ -623,16 +623,7 @@
           "width": "320px",
           "height": "36px",
           "className": "codehinter-plugins",
-          "placeholder": "widgets"
-        },
-        "properties": {
-          "label": "Params/Body",
-          "key": "properties",
-          "type": "codehinter",
-          "mode": "javascript",
-          "placeholder": "{fields:[...] ...}",
-          "description": "Enter properties",
-          "height": "200px"
+          "placeholder": "admins, permissions, favourite"
         }
       },
       "get_issues_for_board": {

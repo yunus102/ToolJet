@@ -9,6 +9,7 @@ export type QueryOptions = {
   query?: string;
   start_at?: any;
   max_results?: any;
+  project_name?: string;
 
   expand?: string;
 
