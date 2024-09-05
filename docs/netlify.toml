@@ -7,3 +7,15 @@
   NODE_ENV = "production"  
   NODE_VERSION = "18.18.2"
   NPM_VERSION = "9.8.1"
+
+
+[[redirects]]
+  from = "/docs/2.75.0/*"
+  to = "https://archived-docs.tooljet.com/2.62.0/:splat"
+  status = 301
+
+
+
+[[redirects]]
+  from = "/docs/2.80.0/*"
+  to = "https://archived-docs.tooljet.com/2.61.0/:splat"
