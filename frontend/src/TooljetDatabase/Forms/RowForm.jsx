@@ -183,14 +183,20 @@ const RowForm = ({
 
   const handleInputChange = (index, value, columnName) => {
     const newInputValues = [...inputValues];
+    const isNull = value === null || value === 'Null';
     newInputValues[index] = {
       value: value === 'Null' ? null : value,
       checkboxValue: inputValues[index].checkboxValue,
-      disabled: false,
+      disabled: isNull,
       label: value === 'Null' ? null : value,
     };
     setInputValues(newInputValues);
     setData({ ...data, [columnName]: value === 'Null' ? null : value });
+    if (isNull) {
+      const newActiveTabs = [...activeTab];
+      newActiveTabs[index] = 'Null';
+      setActiveTab(newActiveTabs);
+    }
   };
 
   const handleCheckboxChange = (index, value, columnName) => {
@@ -316,6 +322,11 @@ const RowForm = ({
 
   const renderElement = (columnName, dataType, isPrimaryKey, defaultValue, index, isNullable) => {
     const isSerialDataTypeColumn = dataType === 'serial';
+    const handleInputFocus = () => {
+      if (activeTab[index] === 'Null') {
+        handleTabClick(index, 'Custom', defaultValue, null, columnName, dataType);
+      }
+    };
     switch (dataType) {
       case 'character varying':
       case 'integer':
@@ -373,6 +384,7 @@ const RowForm = ({
                     ? ''
                     : inputValues[index]?.value
                 }
+                onFocus={handleInputFocus}
                 onChange={(e) => handleInputChange(index, e.target.value, columnName)}
                 disabled={isSerialDataTypeColumn || inputValues[index]?.disabled}
                 placeholder={
