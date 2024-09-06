@@ -255,7 +255,7 @@ export const NumberInput = function NumberInput({
     });
 
     setExposedVariable('clear', async function () {
-      setValue('');
+      setValue(null);
       setExposedVariable('value', '');
       fireEvent('onChange');
     });
