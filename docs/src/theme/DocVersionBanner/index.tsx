@@ -12,7 +12,7 @@ import {ThemeClassNames} from '@docusaurus/theme-common';
 import {
   useDocsPreferredVersion,
   useDocsVersion,
-} from '@docusaurus/plugin-content-docs/client';
+} from '@docusaurus/theme-common/internal';
 import type {Props} from '@theme/DocVersionBanner';
 import type {
   VersionBanner,
@@ -107,8 +107,8 @@ function LatestVersionSuggestionLabel({
         ''
       }
     </Translate>
-    <h4>For up-to-date documentation, visit <a target="_blank" rel="noopener noreferrer" href="https://docs.tooljet.com/docs">ToolJet Docs</a>.</h4>
-    </>
+        <h4>For up-to-date documentation, visit <a target="_blank" rel="noopener noreferrer" href="https://docs.tooljet.com/docs">ToolJet Docs</a>.</h4>
+        </>
   );
 }
 
