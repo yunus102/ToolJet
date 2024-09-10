@@ -16,12 +16,12 @@ module.exports = {
   themeConfig: {
     image: 'img/tooljet-og-image.png',
     announcementBar: {
-      id: 'support_us',
+      id: 'archived_docs',
       content:
-        '⭐️ If you like ToolJet, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/ToolJet/ToolJet">GitHub</a> and follow us on <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/ToolJet">Twitter</a>',
-      backgroundColor: '#4D72DA',
-      textColor: '#ffffff',
-      isCloseable: true,
+        '📚 You are viewing archived documentation. For the latest version, visit <a target="_blank" rel="noopener noreferrer" href="https://docs.tooljet.com/docs">ToolJet Docs</a>.',
+      backgroundColor: '#4D72DA', 
+      textColor: '#ffffff', 
+      isCloseable: false,
     },
     docs: {
       sidebar: {
