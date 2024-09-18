@@ -218,7 +218,9 @@ const sidebars = {
         'how-to/use-url-params-on-load',
         'how-to/pass-query-params-in-custom-components',
         'how-to/use-custom-parameters',
+        'how-to/build-dynamic-forms',
         'how-to/setup-rsyslog',
+        'how-to/conditionally-display-components',
         'how-to/use-inspector',
         'how-to/use-form-component',
         'how-to/access-cellvalue-rowdata',
@@ -429,6 +431,7 @@ const sidebars = {
             'marketplace/plugins/marketplace-plugin-supabase',
             'marketplace/plugins/marketplace-plugin-pocketbase',
             'marketplace/plugins/marketplace-plugin-prestodb',
+            'marketplace/plugins/marketplace-plugin-jira',
           ],
         },
       ],
@@ -477,6 +480,16 @@ const sidebars = {
           'items': [
             'contributing-guide/marketplace/marketplace-setup',
             'contributing-guide/marketplace/creating-a-plugin',
+          ],
+        },
+        {
+          'type': 'category',
+          'label': 'Documentation',
+          'items': [
+            'contributing-guide/documentation-guidelines/introduction',
+            'contributing-guide/documentation-guidelines/pr-checklist',
+            'contributing-guide/documentation-guidelines/style-guide',
+
           ],
         },
         'tooljet-cli',

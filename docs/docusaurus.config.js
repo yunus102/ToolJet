@@ -1,4 +1,14 @@
 const devServerPlugin = require('./src/plugins/devServer/index.js');
+import versionsArchived from './versionsArchived.json';
+
+const baseArchivedURL = "https://archived-docs.tooljet.com/docs/";
+
+const lastFiveArchivedVersions = versionsArchived
+  .slice(0, 5)
+  .map((version, index) => ({
+    version,
+    url: index === 0 ? baseArchivedURL : `${baseArchivedURL}${version}`
+  }));
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -122,9 +132,9 @@ module.exports = {
           // Please change this to your repo.
           editUrl: 'https://github.com/ToolJet/Tooljet/blob/develop/docs/',
           includeCurrentVersion: false,
-          lastVersion: '2.62.0',
+          lastVersion: '2.65.0',
           versions: {
-            '2.62.0': {
+            '2.65.0': {
               banner: 'unmaintained'
             }
           }
