@@ -327,7 +327,19 @@ export async function executeActionsForEventId(_ref, eventId, component, mode, c
   const filteredEvents = events.filter((event) => event.eventId === eventId);
 
   for (const event of filteredEvents) {
-    await executeAction(_ref, event, mode, customVariables); // skipcq: JS-0032
+    try {
+      await executeAction(_ref, event, mode, customVariables); // skipcq: JS-0032
+    } catch (e) {
+      useCurrentStateStore.getState().actions.setErrors({
+        [eventId]: {
+          type: 'event',
+          data: {
+            message: `Something went wrong`,
+            status: 'Failed',
+          },
+        },
+      });
+    }
   }
 }
 
@@ -1329,6 +1341,7 @@ export const debuggerActions = {
           break;
 
         default:
+          generalProps.message = value.data.message;
           break;
       }
       errorsArr.push({
